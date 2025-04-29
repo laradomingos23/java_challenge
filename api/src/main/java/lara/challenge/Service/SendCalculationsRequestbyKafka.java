@@ -25,31 +25,37 @@ public class SendCalculationsRequestbyKafka {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public BigDecimal calculate(String operation, BigDecimal a, BigDecimal b, String correlationID) throws Exception {
-        logger.info("Calculation Started");
-        CalculatorRequest request = new CalculatorRequest(correlationID, operation, a, b);
-        logger.info(String.format("Calculator request => %s", request.toString()));
+    public BigDecimal calculate(String operation, BigDecimal a, BigDecimal b, String requestID) throws Exception {
+
+        CalculatorRequest request = new CalculatorRequest(requestID, operation, a, b);
+        logger.info("Calculator Resquest Created : {}", request);
         
         CompletableFuture<BigDecimal> future = new CompletableFuture<>();
-        futures.put(correlationID, future);
-        kafkaTemplate.send("operations-request", correlationID, request);
+        futures.put(requestID, future);
+        kafkaTemplate.send("operations-request", requestID, request);
+        logger.info("Sent CalculatorRequest [operation={}, a={}, b={}] to Kafka topic '{}' with correlationId='{}'", 
+             operation, a, b, "operations-request", requestID);
 
         try {
             BigDecimal result = future.get(20, TimeUnit.SECONDS);
-            futures.remove(correlationID);
+            logger.info("Received calculation result for requestId='{}': {}", requestID, result);
+            futures.remove(requestID);
             return result;
         } catch (TimeoutException e) {
-            futures.remove(correlationID);
-            logger.error("Timeout waiting for response for correlation ID: {}", correlationID);
+            futures.remove(requestID);
+            logger.error("Timeout waiting for response for requestId: {}", requestID);
             throw new RuntimeException("Timeout waiting for calculation response");
         }
     }
 
     // Método chamado pelo listener para resolver o future
-    public void completeOperation(String correlationId, BigDecimal result) {
-        CompletableFuture<BigDecimal> future = futures.get(correlationId);
+    public void completeOperation(String requestId, BigDecimal result) {
+        CompletableFuture<BigDecimal> future = futures.get(requestId);
         if (future != null) {
             future.complete(result);
+            logger.info("Completed future for requestId='{}' with result={}", requestId, result);
+        } else {
+            logger.warn("No pending future found for requestId='{}'. Ignoring response.", requestId); 
         }
     }
 }
