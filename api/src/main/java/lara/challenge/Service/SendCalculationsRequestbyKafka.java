@@ -29,12 +29,12 @@ public class SendCalculationsRequestbyKafka {
 
         CalculatorRequest request = new CalculatorRequest(requestID, operation, a, b);
         logger.info("Calculator Resquest Created : {}", request);
-        
+
         CompletableFuture<BigDecimal> future = new CompletableFuture<>();
         futures.put(requestID, future);
         kafkaTemplate.send("operations-request", requestID, request);
-        logger.info("Sent CalculatorRequest [operation={}, a={}, b={}] to Kafka topic '{}' with correlationId='{}'", 
-             operation, a, b, "operations-request", requestID);
+        logger.info("Sent CalculatorRequest [operation={}, a={}, b={}] to Kafka topic '{}' with correlationId='{}'",
+                operation, a, b, "operations-request", requestID);
 
         try {
             BigDecimal result = future.get(20, TimeUnit.SECONDS);
@@ -55,7 +55,7 @@ public class SendCalculationsRequestbyKafka {
             future.complete(result);
             logger.info("Completed future for requestId='{}' with result={}", requestId, result);
         } else {
-            logger.warn("No pending future found for requestId='{}'. Ignoring response.", requestId); 
+            logger.warn("No pending future found for requestId='{}'. Ignoring response.", requestId);
         }
     }
 }

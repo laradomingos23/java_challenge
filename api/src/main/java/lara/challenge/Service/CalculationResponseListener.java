@@ -10,18 +10,14 @@ import challenge.DTO.CalculatorResponse;
 
 @Service
 public class CalculationResponseListener {
-     private static final Logger logger = LoggerFactory.getLogger(CalculationResponseListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(CalculationResponseListener.class);
     private final SendCalculationsRequestbyKafka sendCalculationsRequestbyKafka;
 
     public CalculationResponseListener(SendCalculationsRequestbyKafka sendCalculationsRequestbyKafka) {
         this.sendCalculationsRequestbyKafka = sendCalculationsRequestbyKafka;
     }
 
-    @KafkaListener(
-        topics = "operations-response",
-        groupId = "rest-group",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
+    @KafkaListener(topics = "operations-response", groupId = "rest-group", containerFactory = "kafkaListenerContainerFactory")
     public void listenResponse(CalculatorResponse response) {
         logger.info("Received response for requestId: {}", response.getRequestId());
         sendCalculationsRequestbyKafka.completeOperation(response.getRequestId(), response.getResult());

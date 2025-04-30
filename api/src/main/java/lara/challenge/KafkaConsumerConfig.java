@@ -18,7 +18,7 @@ import challenge.DTO.CalculatorResponse;
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
-       @Bean
+    @Bean
     public ConsumerFactory<String, CalculatorResponse> consumerFactory() {
         JsonDeserializer<CalculatorResponse> deserializer = new JsonDeserializer<>(CalculatorResponse.class);
         deserializer.setRemoveTypeHeaders(false);
@@ -30,14 +30,13 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "rest-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
-        
+
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, CalculatorResponse> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, CalculatorResponse> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, CalculatorResponse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
