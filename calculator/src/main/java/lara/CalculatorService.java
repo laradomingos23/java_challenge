@@ -30,15 +30,15 @@ public class CalculatorService {
 
             switch (calculatorRequest.getOperation()) {
                 case "SUM":
-                    logger.info("Started sum operation: a={}+b={}", numA, numB);
+                    logger.info("Started sum operation: {}+{}", numA, numB);
                     result = numA.add(numB);
                     break;
                 case "SUBTRACT":
-                    logger.info("Started subtraction operation: a={}-b={}", numA, numB);
+                    logger.info("Started subtraction operation: {}-{}", numA, numB);
                     result = numA.subtract(numB);
                     break;
                 case "MULTIPLY":
-                    logger.info("Started multiplication operation: a={}*b={}", numA, numB);
+                    logger.info("Started multiplication operation: {}*{}", numA, numB);
                     result = numA.multiply(numB);
                     break;
                 case "DIVIDE":
@@ -46,7 +46,7 @@ public class CalculatorService {
                         logger.error("The number {} cannot be divided by zero.", numA);
                         throw new ArithmeticException("The number cannot be divided by zero.");
                     }
-                    logger.info("Started division operation: a={}/b={}", numA, numB);
+                    logger.info("Started division operation: {}/{}", numA, numB);
                     result = numA.divide(numB, 20, RoundingMode.HALF_UP);
                     break;
                 default:
