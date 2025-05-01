@@ -12,12 +12,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public class CalculatorServiceTest {
     
-    @SuppressWarnings("unchecked")
-    KafkaTemplate<String, CalculatorResponse> kafkaTemplate = (KafkaTemplate<String, CalculatorResponse>) mock(KafkaTemplate.class);
+    KafkaTemplate<String, CalculatorResponse> kafkaTemplate;
     private CalculatorService service;
 
     @BeforeEach
     public void setUp() {
+        kafkaTemplate = mock(KafkaTemplate.class);
         service = new CalculatorService(kafkaTemplate);
     }
 
